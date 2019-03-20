@@ -8,6 +8,7 @@ public class Block {
     public String previousHash;
     private String data; //our data will be a simple message.
     private long timeStamp; //as number of milliseconds since 1/1/1970.
+    private int nonce;
 
     //Block Constructor.
     public Block(String data,String previousHash ) {
@@ -18,7 +19,8 @@ public class Block {
     }
 
     public String calculateHash() {
-        String calculatedhash = StringUtil.applySha256(previousHash + Long.toString(timeStamp) + data);
+        String calculatedhash = StringUtil.applySha256(previousHash + timeStamp + nonce + data);
+
         return calculatedhash;
     }
 }
