@@ -30,7 +30,7 @@ public class DumbChain {
         genesisTransaction.generateSignature(coinbase.getPrivateKey());	 //manually sign the genesis transaction
         genesisTransaction.setTransactionId("0"); //manually set the transaction id
         genesisTransaction.getOutputs().add(new TransactionOutput(genesisTransaction.getReciepient(), genesisTransaction.getValue(), genesisTransaction.getTransactionId())); //manually add the Transactions Output
-        UTXOs.put(genesisTransaction.getOutputs().get(0).id, genesisTransaction.getOutputs().get(0)); //its important to store our first transaction in the UTXOs list.
+        UTXOs.put(genesisTransaction.getOutputs().get(0).getId(), genesisTransaction.getOutputs().get(0)); //its important to store our first transaction in the UTXOs list.
 
         System.out.println("Creating and Mining Genesis block... ");
         Block genesis = new Block("0");
@@ -69,7 +69,7 @@ public class DumbChain {
         Block previousBlock;
         String hashTarget = new String(new char[difficulty]).replace('\0', '0');
         HashMap<String,TransactionOutput> tempUTXOs = new HashMap<String,TransactionOutput>(); //a temporary working list of unspent transactions at a given block state.
-        tempUTXOs.put(genesisTransaction.getOutputs().get(0).id, genesisTransaction.getOutputs().get(0));
+        tempUTXOs.put(genesisTransaction.getOutputs().get(0).getId(), genesisTransaction.getOutputs().get(0));
 
         //loop through blockchain to check hashes:
         for(int i=1; i < blockchain.size(); i++) {
@@ -114,7 +114,7 @@ public class DumbChain {
                         return false;
                     }
 
-                    if(input.UTXO.value != tempOutput.value) {
+                    if(input.UTXO.getValue() != tempOutput.getValue()) {
                         System.out.println("#Referenced input Transaction(" + t + ") value is Invalid");
                         return false;
                     }
@@ -123,14 +123,14 @@ public class DumbChain {
                 }
 
                 for(TransactionOutput output: currentTransaction.getOutputs()) {
-                    tempUTXOs.put(output.id, output);
+                    tempUTXOs.put(output.getId(), output);
                 }
 
-                if( currentTransaction.getOutputs().get(0).reciepient != currentTransaction.getReciepient()) {
+                if( currentTransaction.getOutputs().get(0).getReciepient() != currentTransaction.getReciepient()) {
                     System.out.println("#Transaction(" + t + ") output reciepient is not who it should be");
                     return false;
                 }
-                if( currentTransaction.getOutputs().get(1).reciepient != currentTransaction.getSender()) {
+                if( currentTransaction.getOutputs().get(1).getReciepient() != currentTransaction.getSender()) {
                     System.out.println("#Transaction(" + t + ") output 'change' is not sender.");
                     return false;
                 }

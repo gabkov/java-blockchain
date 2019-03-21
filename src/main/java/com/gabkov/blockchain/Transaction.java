@@ -72,13 +72,13 @@ public class Transaction {
 
         //add outputs to Unspent list
         for (TransactionOutput o : outputs) {
-            DumbChain.UTXOs.put(o.id, o);
+            DumbChain.UTXOs.put(o.getId(), o);
         }
 
         //remove transaction inputs from UTXO lists as spent:
         for (TransactionInput i : inputs) {
             if (i.UTXO == null) continue; //if Transaction can't be found skip it
-            DumbChain.UTXOs.remove(i.UTXO.id);
+            DumbChain.UTXOs.remove(i.UTXO.getId());
         }
 
         return true;
@@ -89,7 +89,7 @@ public class Transaction {
         float total = 0;
         for (TransactionInput i : inputs) {
             if (i.UTXO == null) continue; //if Transaction can't be found skip it
-            total += i.UTXO.value;
+            total += i.UTXO.getValue();
         }
         return total;
     }
@@ -98,7 +98,7 @@ public class Transaction {
     public float getOutputsValue() {
         float total = 0;
         for (TransactionOutput o : outputs) {
-            total += o.value;
+            total += o.getValue();
         }
         return total;
     }
