@@ -55,11 +55,11 @@ public class Transaction {
 
         //gather transaction inputs (Make sure they are unspent):
         for (TransactionInput i : inputs) {
-            i.setUTXO(DumbChain.UTXOs.get(i.getTransactionOutputId()));
+            i.setUTXO(DumbChain.getUTXOs().get(i.getTransactionOutputId()));
         }
 
         //check if transaction is valid:
-        if (getInputsValue() < DumbChain.minimumTransaction) {
+        if (getInputsValue() < DumbChain.getMinimumTransaction()) {
             System.out.println("#Transaction Inputs to small: " + getInputsValue());
             return false;
         }
@@ -72,13 +72,13 @@ public class Transaction {
 
         //add outputs to Unspent list
         for (TransactionOutput o : outputs) {
-            DumbChain.UTXOs.put(o.getId(), o);
+            DumbChain.getUTXOs().put(o.getId(), o);
         }
 
         //remove transaction inputs from UTXO lists as spent:
         for (TransactionInput i : inputs) {
             if (i.getUTXO() == null) continue; //if Transaction can't be found skip it
-            DumbChain.UTXOs.remove(i.getUTXO().getId());
+            DumbChain.getUTXOs().remove(i.getUTXO().getId());
         }
 
         return true;
