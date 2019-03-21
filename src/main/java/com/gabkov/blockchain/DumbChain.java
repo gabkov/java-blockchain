@@ -15,6 +15,20 @@ public class DumbChain {
     private static Wallet walletB;
     private static Transaction genesisTransaction;
 
+
+    public static HashMap<String, TransactionOutput> getUTXOs() {
+        return UTXOs;
+    }
+
+    public static float getMinimumTransaction() {
+        return minimumTransaction;
+    }
+
+    public static void addBlock(Block newBlock) {
+        newBlock.mineBlock(difficulty);
+        blockchain.add(newBlock);
+    }
+
     public static void main(String[] args) {
 
         //Setup Bouncey castle as a Security Provider
@@ -140,66 +154,5 @@ public class DumbChain {
         }
         System.out.println("Blockchain is valid");
         return true;
-    }
-
-    public static void addBlock(Block newBlock) {
-        newBlock.mineBlock(difficulty);
-        blockchain.add(newBlock);
-    }
-
-    public static ArrayList<Block> getBlockchain() {
-        return blockchain;
-    }
-
-    public static void setBlockchain(ArrayList<Block> blockchain) {
-        DumbChain.blockchain = blockchain;
-    }
-
-    public static HashMap<String, TransactionOutput> getUTXOs() {
-        return UTXOs;
-    }
-
-    public static void setUTXOs(HashMap<String, TransactionOutput> UTXOs) {
-        DumbChain.UTXOs = UTXOs;
-    }
-
-    public static int getDifficulty() {
-        return difficulty;
-    }
-
-    public static void setDifficulty(int difficulty) {
-        DumbChain.difficulty = difficulty;
-    }
-
-    public static float getMinimumTransaction() {
-        return minimumTransaction;
-    }
-
-    public static void setMinimumTransaction(float minimumTransaction) {
-        DumbChain.minimumTransaction = minimumTransaction;
-    }
-
-    public static Wallet getWalletA() {
-        return walletA;
-    }
-
-    public static void setWalletA(Wallet walletA) {
-        DumbChain.walletA = walletA;
-    }
-
-    public static Wallet getWalletB() {
-        return walletB;
-    }
-
-    public static void setWalletB(Wallet walletB) {
-        DumbChain.walletB = walletB;
-    }
-
-    public static Transaction getGenesisTransaction() {
-        return genesisTransaction;
-    }
-
-    public static void setGenesisTransaction(Transaction genesisTransaction) {
-        DumbChain.genesisTransaction = genesisTransaction;
     }
 }

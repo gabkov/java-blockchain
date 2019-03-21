@@ -19,10 +19,6 @@ public class TransactionInput {
         return transactionOutputId;
     }
 
-    public void setTransactionOutputId(String transactionOutputId) {
-        this.transactionOutputId = transactionOutputId;
-    }
-
     public TransactionOutput getUTXO() {
         return UTXO;
     }

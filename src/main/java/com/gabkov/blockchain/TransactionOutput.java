@@ -30,31 +30,12 @@ public class TransactionOutput {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public PublicKey getReciepient() {
         return reciepient;
-    }
-
-    public void setReciepient(PublicKey reciepient) {
-        this.reciepient = reciepient;
     }
 
     public float getValue() {
         return value;
     }
 
-    public void setValue(float value) {
-        this.value = value;
-    }
-
-    public String getParentTransactionId() {
-        return parentTransactionId;
-    }
-
-    public void setParentTransactionId(String parentTransactionId) {
-        this.parentTransactionId = parentTransactionId;
-    }
 }

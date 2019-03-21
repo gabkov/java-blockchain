@@ -115,47 +115,23 @@ public class Transaction {
         return sender;
     }
 
-    public void setSender(PublicKey sender) {
-        this.sender = sender;
-    }
 
     public PublicKey getReciepient() {
         return reciepient;
     }
 
-    public void setReciepient(PublicKey reciepient) {
-        this.reciepient = reciepient;
-    }
 
     public float getValue() {
         return value;
-    }
-
-    public void setValue(float value) {
-        this.value = value;
-    }
-
-    public byte[] getSignature() {
-        return signature;
-    }
-
-    public void setSignature(byte[] signature) {
-        this.signature = signature;
     }
 
     public ArrayList<TransactionInput> getInputs() {
         return inputs;
     }
 
-    public void setInputs(ArrayList<TransactionInput> inputs) {
-        this.inputs = inputs;
-    }
 
     public ArrayList<TransactionOutput> getOutputs() {
         return outputs;
     }
 
-    public void setOutputs(ArrayList<TransactionOutput> outputs) {
-        this.outputs = outputs;
-    }
 }
