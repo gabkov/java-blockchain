@@ -19,9 +19,14 @@ public class DumbChain {
         System.out.println("Trying to Mine block 2... ");
         blockchain.get(1).mineBlock(difficulty);
 
+        // invalid block
+        blockchain.add(new Block("Invalid block", "kdjlksajd7dsa8cddjkaldsad78sad87asdjksa"));
+        System.out.println("Trying to mine the invalid block");
+        blockchain.get(2).mineBlock(difficulty);
+
         blockchain.add(new Block("Hey im the third block",blockchain.get(blockchain.size()-1).hash));
         System.out.println("Trying to Mine block 3... ");
-        blockchain.get(2).mineBlock(difficulty);
+        blockchain.get(3).mineBlock(difficulty);
 
 
         System.out.println("\nBlockchain is Valid: " + isChainValid());
