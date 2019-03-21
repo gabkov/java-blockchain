@@ -107,19 +107,19 @@ public class DumbChain {
                 }
 
                 for(TransactionInput input: currentTransaction.getInputs()) {
-                    tempOutput = tempUTXOs.get(input.transactionOutputId);
+                    tempOutput = tempUTXOs.get(input.getTransactionOutputId());
 
                     if(tempOutput == null) {
                         System.out.println("#Referenced input on Transaction(" + t + ") is Missing");
                         return false;
                     }
 
-                    if(input.UTXO.getValue() != tempOutput.getValue()) {
+                    if(input.getUTXO().getValue() != tempOutput.getValue()) {
                         System.out.println("#Referenced input Transaction(" + t + ") value is Invalid");
                         return false;
                     }
 
-                    tempUTXOs.remove(input.transactionOutputId);
+                    tempUTXOs.remove(input.getTransactionOutputId());
                 }
 
                 for(TransactionOutput output: currentTransaction.getOutputs()) {

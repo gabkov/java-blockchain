@@ -55,7 +55,7 @@ public class Transaction {
 
         //gather transaction inputs (Make sure they are unspent):
         for (TransactionInput i : inputs) {
-            i.UTXO = DumbChain.UTXOs.get(i.transactionOutputId);
+            i.setUTXO(DumbChain.UTXOs.get(i.getTransactionOutputId()));
         }
 
         //check if transaction is valid:
@@ -77,8 +77,8 @@ public class Transaction {
 
         //remove transaction inputs from UTXO lists as spent:
         for (TransactionInput i : inputs) {
-            if (i.UTXO == null) continue; //if Transaction can't be found skip it
-            DumbChain.UTXOs.remove(i.UTXO.getId());
+            if (i.getUTXO() == null) continue; //if Transaction can't be found skip it
+            DumbChain.UTXOs.remove(i.getUTXO().getId());
         }
 
         return true;
@@ -88,8 +88,8 @@ public class Transaction {
     public float getInputsValue() {
         float total = 0;
         for (TransactionInput i : inputs) {
-            if (i.UTXO == null) continue; //if Transaction can't be found skip it
-            total += i.UTXO.getValue();
+            if (i.getUTXO() == null) continue; //if Transaction can't be found skip it
+            total += i.getUTXO().getValue();
         }
         return total;
     }
