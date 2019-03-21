@@ -23,6 +23,10 @@ public class DumbChain {
         System.out.println("Trying to Mine block 3... ");
         blockchain.get(2).mineBlock(difficulty);
 
+
+        System.out.println("\nBlockchain is Valid: " + isChainValid());
+
+
         String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
         System.out.println("\nThe block chain: ");
         System.out.println(blockchainJson);
