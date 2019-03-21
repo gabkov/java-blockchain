@@ -33,4 +33,15 @@ public class Transaction {
                         value + sequence
         );
     }
+
+    //Signs all the data we dont wish to be tampered with.
+    public void generateSignature(PrivateKey privateKey) {
+        String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient) + value;
+        signature = StringUtil.applyECDSASig(privateKey,data);
+    }
+    //Verifies the data we signed hasnt been tampered with
+    public boolean verifiySignature() {
+        String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient) + value;
+        return StringUtil.verifyECDSASig(sender, data, signature);
+    }
 }
