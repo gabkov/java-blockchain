@@ -13,7 +13,7 @@ public class Block {
     private int nonce;
 
     //Block Constructor.
-    public Block(String previousHash ) {
+    public Block(String previousHash) {
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
         this.hash = calculateHash();
@@ -27,8 +27,8 @@ public class Block {
 
     public void mineBlock(int difficulty) {
         String target = new String(new char[difficulty]).replace('\0', '0'); //Create a string with difficulty * "0"
-        while(!hash.substring( 0, difficulty).equals(target)) {
-            nonce ++;
+        while (!hash.substring(0, difficulty).equals(target)) {
+            nonce++;
             hash = calculateHash();
         }
         System.out.println("Block Mined!!! : " + hash);
@@ -37,9 +37,9 @@ public class Block {
     //Add transactions to this block
     public boolean addTransaction(Transaction transaction) {
         //process transaction and check if valid, unless block is genesis block then ignore.
-        if(transaction == null) return false;
-        if((previousHash != "0")) {
-            if((transaction.processTransaction() != true)) {
+        if (transaction == null) return false;
+        if ((previousHash != "0")) {
+            if ((transaction.processTransaction() != true)) {
                 System.out.println("Transaction failed to process. Discarded.");
                 return false;
             }
