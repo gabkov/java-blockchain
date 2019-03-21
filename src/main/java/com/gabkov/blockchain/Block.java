@@ -1,5 +1,8 @@
 package com.gabkov.blockchain;
 
+import com.gabkov.blockchain.transaction.Transaction;
+import com.gabkov.blockchain.utils.StringUtil;
+
 import java.util.ArrayList;
 import java.util.Date;
 

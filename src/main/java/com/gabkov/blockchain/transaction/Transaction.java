@@ -1,4 +1,7 @@
-package com.gabkov.blockchain;
+package com.gabkov.blockchain.transaction;
+
+import com.gabkov.blockchain.DumbChain;
+import com.gabkov.blockchain.utils.StringUtil;
 
 import java.security.*;
 import java.util.ArrayList;

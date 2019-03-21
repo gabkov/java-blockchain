@@ -1,5 +1,9 @@
 package com.gabkov.blockchain;
 
+import com.gabkov.blockchain.transaction.Transaction;
+import com.gabkov.blockchain.transaction.TransactionInput;
+import com.gabkov.blockchain.transaction.TransactionOutput;
+
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
