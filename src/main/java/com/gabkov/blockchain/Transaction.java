@@ -11,8 +11,8 @@ public class Transaction {
     public float value;
     public byte[] signature; // this is to prevent anybody else from spending funds in our wallet.
 
-    public ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
-    public ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
+    public ArrayList<TransactionInput> inputs;
+    public ArrayList<TransactionOutput> outputs = new ArrayList<>();
 
     private static int sequence = 0; // a rough count of how many transactions have been generated.
 
@@ -30,7 +30,7 @@ public class Transaction {
         return StringUtil.applySha256(
                 StringUtil.getStringFromKey(sender) +
                         StringUtil.getStringFromKey(reciepient) +
-                        Float.toString(value) + sequence
+                        value + sequence
         );
     }
 }
