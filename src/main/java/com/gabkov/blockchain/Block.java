@@ -5,10 +5,10 @@ import java.util.Date;
 
 public class Block {
 
-    public String hash;
-    public String previousHash;
-    public String merkleRoot;
-    public ArrayList<Transaction> transactions = new ArrayList<>(); //our data will be a simple message.
+    private String hash;
+    private String previousHash;
+    private String merkleRoot;
+    private ArrayList<Transaction> transactions = new ArrayList<>(); //our data will be a simple message.
     private long timeStamp; //as number of milliseconds since 1/1/1970.
     private int nonce;
 
@@ -49,4 +49,35 @@ public class Block {
         return true;
     }
 
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public String getPreviousHash() {
+        return previousHash;
+    }
+
+    public void setPreviousHash(String previousHash) {
+        this.previousHash = previousHash;
+    }
+
+    public String getMerkleRoot() {
+        return merkleRoot;
+    }
+
+    public void setMerkleRoot(String merkleRoot) {
+        this.merkleRoot = merkleRoot;
+    }
+
+    public ArrayList<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(ArrayList<Transaction> transactions) {
+        this.transactions = transactions;
+    }
 }
