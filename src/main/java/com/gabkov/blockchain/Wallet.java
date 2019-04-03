@@ -6,7 +6,6 @@ import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
 import com.gabkov.blockchain.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;

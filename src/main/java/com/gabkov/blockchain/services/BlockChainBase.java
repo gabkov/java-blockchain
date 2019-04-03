@@ -32,8 +32,6 @@ public class BlockChainBase {
 
     private static Transaction genesisTransaction;
 
-    public List<Transaction> currentTransactions = new ArrayList<>();
-
     private Block currentBlock;
 
     public static HashMap<String, TransactionOutput> getUTXOs() {
@@ -47,7 +45,6 @@ public class BlockChainBase {
     public BlockChainBase(WalletCreator walletCreator){
         this.walletCreator = walletCreator;
     }
-
 
     public static void addBlock(Block newBlock) {
         newBlock.mineBlock(difficulty);

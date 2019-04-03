@@ -19,7 +19,6 @@ public class Transaction {
 
     private static int sequence = 0; // a rough count of how many transactions have been generated.
 
-
     public Transaction(PublicKey from, PublicKey to, float value, ArrayList<TransactionInput> inputs) {
         this.sender = from;
         this.reciepient = to;
