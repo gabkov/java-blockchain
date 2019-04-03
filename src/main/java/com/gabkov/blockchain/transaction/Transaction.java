@@ -1,6 +1,5 @@
 package com.gabkov.blockchain.transaction;
 
-import com.gabkov.blockchain.DumbChain;
 import com.gabkov.blockchain.services.BlockChainBase;
 import com.gabkov.blockchain.utils.StringUtil;
 
