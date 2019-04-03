@@ -1,15 +1,26 @@
 package com.gabkov.blockchain.controller;
 
 
-import org.springframework.stereotype.Controller;
+import com.gabkov.blockchain.Wallet;
+import com.gabkov.blockchain.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+
+@RestController
+@Slf4j
 public class ApiController {
 
-    @RequestMapping(value = "/")
-    public String index() {
-        return "index";
+    private final Wallet wallet;
+
+    public ApiController(Wallet wallet){
+        this.wallet = wallet;
+    }
+
+    @RequestMapping(value = "/api/new-wallet", headers = "Accept=application/json")
+    public String newWallet() {
+        return StringUtil.getStringFromKey(wallet.getPublicKey());
     }
 
 }

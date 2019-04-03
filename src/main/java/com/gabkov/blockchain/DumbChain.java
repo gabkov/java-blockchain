@@ -93,7 +93,6 @@ public class DumbChain {
         System.out.println("WalletB's balance is: " + walletB.getBalance());
 
         isChainValid();
-
     }
 
 

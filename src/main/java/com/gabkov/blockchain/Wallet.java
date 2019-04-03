@@ -3,6 +3,7 @@ package com.gabkov.blockchain;
 import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
+import org.springframework.stereotype.Component;
 
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class Wallet {
     private PrivateKey privateKey;
     private PublicKey publicKey;
