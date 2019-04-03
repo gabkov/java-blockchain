@@ -5,6 +5,7 @@ import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
 import com.gabkov.blockchain.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.security.*;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
+@Slf4j
 public class Wallet {
     private PrivateKey privateKey;
     private PublicKey publicKey;
@@ -58,7 +61,7 @@ public class Wallet {
     //Generates and returns a new transaction from this wallet.
     public Transaction sendFunds(PublicKey _recipient, float value) {
         if (getBalance() < value) { //gather balance and check funds.
-            System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
+            log.error("#Not Enough funds to send transaction. Transaction Discarded.");
             return null;
         }
         //create array list of inputs

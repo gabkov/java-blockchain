@@ -5,12 +5,14 @@ import com.gabkov.blockchain.Wallet;
 import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
+import com.gabkov.blockchain.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -34,6 +36,8 @@ public class BlockChainBase {
         return UTXOs;
     }
 
+    public List<Transaction> currentTransactions = new ArrayList<>();
+
     public static float getMinimumTransaction() {
         return minimumTransaction;
     }
@@ -49,7 +53,9 @@ public class BlockChainBase {
     }
 
     public Wallet getNewWallet(){
-        return walletCreator.createNewWallet();
+        Wallet newWallet = walletCreator.createNewWallet();
+        wallets.add(newWallet);
+        return newWallet;
     }
 
     public Wallet getWalletA() {
@@ -59,6 +65,7 @@ public class BlockChainBase {
     public void genesis(){
         //Create the new wallets
         walletA = new Wallet();
+        wallets.add(walletA);
         Wallet coinbase = new Wallet();
 
         //create genesis transaction, which sends 100 NoobCoin to walletA:
@@ -75,6 +82,30 @@ public class BlockChainBase {
         addBlock(genesis);
         System.out.println("Genesis merkle root: " + genesis.getMerkleRoot());
 
+    }
+
+    // block1.addTransaction(walletA.sendFunds(walletB.getPublicKey(), 40f));
+
+    public boolean newTransaction(Map<String, String> transactionData){
+        Wallet from = getWalletByStringPK(transactionData.get("sender"));
+        Wallet to = getWalletByStringPK(transactionData.get("recipient"));
+        if (from == null || to == null){
+            log.error("Invalid addresses");
+            return false;
+        }
+        Transaction newTransaction = from.sendFunds(to.getPublicKey(), Float.valueOf(transactionData.get("value")));
+        if(newTransaction == null) return false;
+        currentTransactions.add(newTransaction);
+        return true;
+    }
+
+    private Wallet getWalletByStringPK(String publicKey){
+        for(Wallet wallet : wallets){
+            if(StringUtil.getStringFromKey(wallet.getPublicKey()).equals(publicKey)){
+                return wallet;
+            }
+        }
+        return null;
     }
 
     public static Boolean isChainValid() {
