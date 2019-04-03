@@ -32,11 +32,13 @@ public class BlockChainBase {
 
     private static Transaction genesisTransaction;
 
+    public List<Transaction> currentTransactions = new ArrayList<>();
+
+    private Block currentBlock;
+
     public static HashMap<String, TransactionOutput> getUTXOs() {
         return UTXOs;
     }
-
-    public List<Transaction> currentTransactions = new ArrayList<>();
 
     public static float getMinimumTransaction() {
         return minimumTransaction;
@@ -81,12 +83,17 @@ public class BlockChainBase {
         genesis.addTransaction(genesisTransaction);
         addBlock(genesis);
         System.out.println("Genesis merkle root: " + genesis.getMerkleRoot());
+        currentBlock = new Block(genesis.getHash());
 
     }
 
     // block1.addTransaction(walletA.sendFunds(walletB.getPublicKey(), 40f));
 
     public boolean newTransaction(Map<String, String> transactionData){
+        // if the current block is already in the blockchain it means we need to start a new block to add the next transactions
+        if(blockchain.contains(currentBlock)){
+            currentBlock = new Block(blockchain.get(blockchain.size()-1).getHash());
+        }
         Wallet from = getWalletByStringPK(transactionData.get("sender"));
         Wallet to = getWalletByStringPK(transactionData.get("recipient"));
         if (from == null || to == null){
@@ -95,8 +102,8 @@ public class BlockChainBase {
         }
         Transaction newTransaction = from.sendFunds(to.getPublicKey(), Float.valueOf(transactionData.get("value")));
         if(newTransaction == null) return false;
-        currentTransactions.add(newTransaction);
-        return true;
+        // adding the new transaction to the currentBlock, more validation inside addTransaction <-- returns a boolean
+        return currentBlock.addTransaction(newTransaction);
     }
 
     private Wallet getWalletByStringPK(String publicKey){
@@ -106,6 +113,11 @@ public class BlockChainBase {
             }
         }
         return null;
+    }
+
+    public void mineNextBlock(){
+        addBlock(currentBlock);
+        isChainValid();
     }
 
     public static Boolean isChainValid() {

@@ -47,4 +47,10 @@ public class ApiController {
         }
     }
 
+    @RequestMapping(value = "/api/mine-next-block")
+    public ResponseEntity<?> mineNextBlock(){
+        blockChainBase.mineNextBlock();
+        return new ResponseEntity<>("Next block mined successfully", HttpStatus.OK);
+    }
+
 }
