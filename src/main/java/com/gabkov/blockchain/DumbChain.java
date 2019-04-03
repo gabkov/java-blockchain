@@ -3,11 +3,14 @@ package com.gabkov.blockchain;
 import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@SpringBootApplication
 public class DumbChain {
 
     private static ArrayList<Block> blockchain = new ArrayList<Block>();
@@ -37,6 +40,8 @@ public class DumbChain {
 
         //Setup Bouncey castle as a Security Provider
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+
+        SpringApplication.run(DumbChain.class, args);
 
         //Create the new wallets
         walletA = new Wallet();
