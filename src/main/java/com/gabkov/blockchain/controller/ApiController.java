@@ -43,7 +43,7 @@ public class ApiController {
         if(blockChainBase.newTransaction(transactionData)){
             return new ResponseEntity<>("Transaction done, waiting for confirmation", HttpStatus.OK);
         }else {
-            return new ResponseEntity<>("Invalid wallet Address", HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>("Invalid transaction", HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
