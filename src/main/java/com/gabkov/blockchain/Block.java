@@ -14,14 +14,13 @@ public class Block {
     private ArrayList<Transaction> transactions = new ArrayList<>(); //our data will be a simple message.
     private long timeStamp; //as number of milliseconds since 1/1/1970.
     private int nonce;
-
     //Block Constructor.
+
     public Block(String previousHash) {
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
         this.hash = calculateHash();
     }
-
     public String calculateHash() {
         String calculatedhash = StringUtil.applySha256(previousHash + timeStamp + nonce + merkleRoot);
 
@@ -39,6 +38,7 @@ public class Block {
     }
 
     //Add transactions to this block
+
     public boolean addTransaction(Transaction transaction) {
         //process transaction and check if valid, unless block is genesis block then ignore.
         if (transaction == null) return false;
@@ -52,7 +52,6 @@ public class Block {
         System.out.println("Transaction Successfully added to Block");
         return true;
     }
-
     public String getHash() {
         return hash;
     }
@@ -63,6 +62,10 @@ public class Block {
 
     public ArrayList<Transaction> getTransactions() {
         return transactions;
+    }
+
+    public String getMerkleRoot() {
+        return merkleRoot;
     }
 
 }
