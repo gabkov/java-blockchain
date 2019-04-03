@@ -5,6 +5,7 @@ import com.gabkov.blockchain.Wallet;
 import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,20 +13,22 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
+@Slf4j
 public class BlockChainBase {
 
     private WalletCreator walletCreator;
     private List<Wallet> wallets = new ArrayList<>();
+
+    // Initial wallet for starting transactions
+    private Wallet walletA;
 
     private static ArrayList<Block> blockchain = new ArrayList<Block>();
     private static HashMap<String, TransactionOutput> UTXOs = new HashMap<>(); //list of all unspent transactions.
 
     private static int difficulty = 3;
     private static float minimumTransaction = 0.1f;
-    private static Wallet walletA;
-    private static Wallet walletB;
-    private static Transaction genesisTransaction;
 
+    private static Transaction genesisTransaction;
 
     public static HashMap<String, TransactionOutput> getUTXOs() {
         return UTXOs;
@@ -45,10 +48,17 @@ public class BlockChainBase {
         blockchain.add(newBlock);
     }
 
+    public Wallet getNewWallet(){
+        return walletCreator.createNewWallet();
+    }
+
+    public Wallet getWalletA() {
+        return walletA;
+    }
+
     public void genesis(){
         //Create the new wallets
         walletA = new Wallet();
-        walletB = new Wallet();
         Wallet coinbase = new Wallet();
 
         //create genesis transaction, which sends 100 NoobCoin to walletA:
@@ -58,7 +68,8 @@ public class BlockChainBase {
         genesisTransaction.getOutputs().add(new TransactionOutput(genesisTransaction.getReciepient(), genesisTransaction.getValue(), genesisTransaction.getTransactionId())); //manually add the Transactions Output
         UTXOs.put(genesisTransaction.getOutputs().get(0).getId(), genesisTransaction.getOutputs().get(0)); //its important to store our first transaction in the UTXOs list.
 
-        System.out.println("Creating and Mining Genesis block... ");
+        //System.out.println("Creating and Mining Genesis block... ");
+        log.info("Creating and Mining Genesis block... ");
         Block genesis = new Block("0");
         genesis.addTransaction(genesisTransaction);
         addBlock(genesis);

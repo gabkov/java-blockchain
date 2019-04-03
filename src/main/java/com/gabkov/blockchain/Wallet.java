@@ -4,6 +4,7 @@ import com.gabkov.blockchain.services.BlockChainBase;
 import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
+import com.gabkov.blockchain.utils.StringUtil;
 import org.springframework.stereotype.Component;
 
 import java.security.*;
@@ -89,4 +90,10 @@ public class Wallet {
         return publicKey;
     }
 
+    @Override
+    public String toString() {
+        return "Wallet: \n" +
+                "publicKey= " + StringUtil.getStringFromKey(publicKey) + "\n" +
+                "balance= " + getBalance();
+    }
 }
