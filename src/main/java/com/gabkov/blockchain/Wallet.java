@@ -1,5 +1,6 @@
 package com.gabkov.blockchain;
 
+import com.gabkov.blockchain.services.BlockChainBase;
 import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 public class Wallet {
     private PrivateKey privateKey;
     private PublicKey publicKey;
@@ -44,7 +44,7 @@ public class Wallet {
     //returns balance and stores the UTXO's owned by this wallet in this.UTXOs
     public float getBalance() {
         float total = 0;
-        for (Map.Entry<String, TransactionOutput> item : DumbChain.getUTXOs().entrySet()) {
+        for (Map.Entry<String, TransactionOutput> item : BlockChainBase.getUTXOs().entrySet()) {
             TransactionOutput UTXO = item.getValue();
             if (UTXO.isMine(publicKey)) { //if output belongs to me ( if coins belong to me )
                 UTXOs.put(UTXO.getId(), UTXO); //add it to our list of unspent transactions.

@@ -1,6 +1,7 @@
 package com.gabkov.blockchain.transaction;
 
 import com.gabkov.blockchain.DumbChain;
+import com.gabkov.blockchain.services.BlockChainBase;
 import com.gabkov.blockchain.utils.StringUtil;
 
 import java.security.*;
@@ -58,11 +59,11 @@ public class Transaction {
 
         //gather transaction inputs (Make sure they are unspent):
         for (TransactionInput i : inputs) {
-            i.setUTXO(DumbChain.getUTXOs().get(i.getTransactionOutputId()));
+            i.setUTXO(BlockChainBase.getUTXOs().get(i.getTransactionOutputId()));
         }
 
         //check if transaction is valid:
-        if (getInputsValue() < DumbChain.getMinimumTransaction()) {
+        if (getInputsValue() < BlockChainBase.getMinimumTransaction()) {
             System.out.println("#Transaction Inputs to small: " + getInputsValue());
             return false;
         }
@@ -75,13 +76,13 @@ public class Transaction {
 
         //add outputs to Unspent list
         for (TransactionOutput o : outputs) {
-            DumbChain.getUTXOs().put(o.getId(), o);
+            BlockChainBase.getUTXOs().put(o.getId(), o);
         }
 
         //remove transaction inputs from UTXO lists as spent:
         for (TransactionInput i : inputs) {
             if (i.getUTXO() == null) continue; //if Transaction can't be found skip it
-            DumbChain.getUTXOs().remove(i.getUTXO().getId());
+            BlockChainBase.getUTXOs().remove(i.getUTXO().getId());
         }
 
         return true;
