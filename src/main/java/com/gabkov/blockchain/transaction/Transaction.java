@@ -2,10 +2,13 @@ package com.gabkov.blockchain.transaction;
 
 import com.gabkov.blockchain.services.BlockChainBase;
 import com.gabkov.blockchain.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.security.*;
 import java.util.ArrayList;
 
+
+@Slf4j
 public class Transaction {
 
     private String transactionId; // this is also the hash of the transaction.
@@ -49,9 +52,8 @@ public class Transaction {
 
     //Returns true if new transaction could be created.
     public boolean processTransaction() {
-
         if (verifiySignature() == false) {
-            System.out.println("#Transaction Signature failed to verify");
+            log.error("#Transaction Signature failed to verify");
             return false;
         }
 
@@ -61,8 +63,9 @@ public class Transaction {
         }
 
         //check if transaction is valid:
+        // Todo check back here why is this not working properly
         if (getInputsValue() < BlockChainBase.getMinimumTransaction()) {
-            System.out.println("#Transaction Inputs to small: " + getInputsValue());
+            log.error("#Transaction Inputs to small: " + getInputsValue());
             return false;
         }
 

@@ -56,7 +56,7 @@ public class ApiController {
 
 
     @RequestMapping(value = "/api/get-blockchain")
-    public HashMap<String, HashMap<String, String>> getCurrentBlockChain(){
+    public List<HashMap<String, HashMap<String, String>>> getCurrentBlockChain(){
         return BlockChainBase.getBlockchain();
     }
 

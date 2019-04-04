@@ -61,9 +61,10 @@ public class BlockChainBase {
         return walletA;
     }
 
-    public static HashMap<String, HashMap<String, String>> getBlockchain() {
-        HashMap<String, HashMap<String, String>> formattedBlockchain = new HashMap<>();
+    public static List<HashMap<String, HashMap<String, String>>> getBlockchain() {
+        List<HashMap<String, HashMap<String, String>>> formattedBlockChain = new ArrayList<>();
         for (int i = 0; i < blockchain.size(); i++) {
+            HashMap<String, HashMap<String, String>> formattedBlock = new HashMap<>();
             Block block = blockchain.get(i);
             HashMap<String, String> blockData = new HashMap<>();
             blockData.put("hash", block.getHash());
@@ -71,10 +72,12 @@ public class BlockChainBase {
             blockData.put("merkle root", block.getMerkleRoot());
             blockData.put("timestamp", String.valueOf(block.getTimeStamp()));
             blockData.put("nonce", String.valueOf(block.getNonce()));
+            blockData.put("number of transactions", String.valueOf(block.getTransactions().size()));
 
-            formattedBlockchain.put("Block " + i, blockData);
+            formattedBlock.put("Block " + i, blockData);
+            formattedBlockChain.add(formattedBlock);
         }
-        return formattedBlockchain;
+        return formattedBlockChain;
     }
 
     public void genesis(){
@@ -107,11 +110,12 @@ public class BlockChainBase {
         }
         Wallet from = getWalletByStringPK(transactionData.get("sender"));
         Wallet to = getWalletByStringPK(transactionData.get("recipient"));
+        float value = Float.parseFloat(transactionData.get("value"));
         if (from == null || to == null){
             log.error("Invalid addresses");
             return false;
         }
-        Transaction newTransaction = from.sendFunds(to.getPublicKey(), Float.valueOf(transactionData.get("value")));
+        Transaction newTransaction = from.sendFunds(to.getPublicKey(), value);
         if(newTransaction == null) return false;
         // adding the new transaction to the currentBlock, more validation inside addTransaction <-- returns a boolean
         return currentBlock.addTransaction(newTransaction);
@@ -145,17 +149,17 @@ public class BlockChainBase {
             previousBlock = blockchain.get(i - 1);
             //compare registered hash and calculated hash:
             if (!currentBlock.getHash().equals(currentBlock.calculateHash())) {
-                System.out.println("#Current Hashes not equal");
+                log.error("#Current Hashes not equal");
                 return false;
             }
             //compare previous hash and registered previous hash
             if (!previousBlock.getHash().equals(currentBlock.getPreviousHash())) {
-                System.out.println("#Previous Hashes not equal");
+                log.error("#Previous Hashes not equal");
                 return false;
             }
             //check if hash is solved
             if (!currentBlock.getHash().substring(0, difficulty).equals(hashTarget)) {
-                System.out.println("#This block hasn't been mined");
+                log.error("#This block hasn't been mined");
                 return false;
             }
 
@@ -165,11 +169,11 @@ public class BlockChainBase {
                 Transaction currentTransaction = currentBlock.getTransactions().get(t);
 
                 if (!currentTransaction.verifiySignature()) {
-                    System.out.println("#Signature on Transaction(" + t + ") is Invalid");
+                    log.error("#Signature on Transaction(" + t + ") is Invalid");
                     return false;
                 }
                 if (currentTransaction.getInputsValue() != currentTransaction.getOutputsValue()) {
-                    System.out.println("#Inputs are note equal to outputs on Transaction(" + t + ")");
+                    log.error("#Inputs are note equal to outputs on Transaction(" + t + ")");
                     return false;
                 }
 
@@ -177,12 +181,12 @@ public class BlockChainBase {
                     tempOutput = tempUTXOs.get(input.getTransactionOutputId());
 
                     if (tempOutput == null) {
-                        System.out.println("#Referenced input on Transaction(" + t + ") is Missing");
+                        log.error("#Referenced input on Transaction(" + t + ") is Missing");
                         return false;
                     }
 
                     if (input.getUTXO().getValue() != tempOutput.getValue()) {
-                        System.out.println("#Referenced input Transaction(" + t + ") value is Invalid");
+                        log.error("#Referenced input Transaction(" + t + ") value is Invalid");
                         return false;
                     }
 
@@ -194,18 +198,18 @@ public class BlockChainBase {
                 }
 
                 if (currentTransaction.getOutputs().get(0).getReciepient() != currentTransaction.getReciepient()) {
-                    System.out.println("#Transaction(" + t + ") output reciepient is not who it should be");
+                    log.error("#Transaction(" + t + ") output reciepient is not who it should be");
                     return false;
                 }
                 if (currentTransaction.getOutputs().get(1).getReciepient() != currentTransaction.getSender()) {
-                    System.out.println("#Transaction(" + t + ") output 'change' is not sender.");
+                    log.error("#Transaction(" + t + ") output 'change' is not sender.");
                     return false;
                 }
 
             }
 
         }
-        System.out.println("Blockchain is valid");
+        log.info("Blockchain is valid");
         return true;
     }
 }

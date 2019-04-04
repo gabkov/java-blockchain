@@ -2,10 +2,12 @@ package com.gabkov.blockchain;
 
 import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+@Slf4j
 public class Block {
 
     private String hash;
@@ -33,7 +35,7 @@ public class Block {
             nonce++;
             hash = calculateHash();
         }
-        System.out.println("Block Mined!!! : " + hash);
+        log.info("Block Mined : " + hash);
     }
 
 
@@ -41,14 +43,14 @@ public class Block {
     public boolean addTransaction(Transaction transaction) {
         //process transaction and check if valid, unless block is genesis block then ignore.
         if (transaction == null) return false;
-        if ((previousHash != "0")) {
+        if ((!previousHash.equals("0"))) {
             if ((transaction.processTransaction() != true)) {
-                System.out.println("Transaction failed to process. Discarded.");
+                log.error("Transaction failed to process. Discarded.");
                 return false;
             }
         }
         transactions.add(transaction);
-        System.out.println("Transaction Successfully added to Block");
+        log.info("Transaction Successfully added to Block");
         return true;
     }
 
