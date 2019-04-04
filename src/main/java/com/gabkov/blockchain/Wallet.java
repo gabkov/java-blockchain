@@ -1,8 +1,11 @@
 package com.gabkov.blockchain;
 
+import com.gabkov.blockchain.services.BlockChainBase;
 import com.gabkov.blockchain.transaction.Transaction;
 import com.gabkov.blockchain.transaction.TransactionInput;
 import com.gabkov.blockchain.transaction.TransactionOutput;
+import com.gabkov.blockchain.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
@@ -10,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
+@Slf4j
 public class Wallet {
     private PrivateKey privateKey;
     private PublicKey publicKey;
@@ -42,7 +47,7 @@ public class Wallet {
     //returns balance and stores the UTXO's owned by this wallet in this.UTXOs
     public float getBalance() {
         float total = 0;
-        for (Map.Entry<String, TransactionOutput> item : DumbChain.getUTXOs().entrySet()) {
+        for (Map.Entry<String, TransactionOutput> item : BlockChainBase.getUTXOs().entrySet()) {
             TransactionOutput UTXO = item.getValue();
             if (UTXO.isMine(publicKey)) { //if output belongs to me ( if coins belong to me )
                 UTXOs.put(UTXO.getId(), UTXO); //add it to our list of unspent transactions.
@@ -55,7 +60,7 @@ public class Wallet {
     //Generates and returns a new transaction from this wallet.
     public Transaction sendFunds(PublicKey _recipient, float value) {
         if (getBalance() < value) { //gather balance and check funds.
-            System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
+            log.error("#Not Enough funds to send transaction. Transaction Discarded.");
             return null;
         }
         //create array list of inputs
@@ -87,4 +92,10 @@ public class Wallet {
         return publicKey;
     }
 
+    @Override
+    public String toString() {
+        return "Wallet: \n" +
+                "publicKey= " + StringUtil.getStringFromKey(publicKey) + "\n" +
+                "balance= " + getBalance();
+    }
 }

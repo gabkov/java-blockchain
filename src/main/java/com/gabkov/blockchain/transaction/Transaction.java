@@ -1,11 +1,14 @@
 package com.gabkov.blockchain.transaction;
 
-import com.gabkov.blockchain.DumbChain;
+import com.gabkov.blockchain.services.BlockChainBase;
 import com.gabkov.blockchain.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.security.*;
 import java.util.ArrayList;
 
+
+@Slf4j
 public class Transaction {
 
     private String transactionId; // this is also the hash of the transaction.
@@ -18,7 +21,6 @@ public class Transaction {
     private ArrayList<TransactionOutput> outputs = new ArrayList<>();
 
     private static int sequence = 0; // a rough count of how many transactions have been generated.
-
 
     public Transaction(PublicKey from, PublicKey to, float value, ArrayList<TransactionInput> inputs) {
         this.sender = from;
@@ -50,20 +52,20 @@ public class Transaction {
 
     //Returns true if new transaction could be created.
     public boolean processTransaction() {
-
         if (verifiySignature() == false) {
-            System.out.println("#Transaction Signature failed to verify");
+            log.error("#Transaction Signature failed to verify");
             return false;
         }
 
         //gather transaction inputs (Make sure they are unspent):
         for (TransactionInput i : inputs) {
-            i.setUTXO(DumbChain.getUTXOs().get(i.getTransactionOutputId()));
+            i.setUTXO(BlockChainBase.getUTXOs().get(i.getTransactionOutputId()));
         }
 
         //check if transaction is valid:
-        if (getInputsValue() < DumbChain.getMinimumTransaction()) {
-            System.out.println("#Transaction Inputs to small: " + getInputsValue());
+        // Todo check back here why is this not working properly
+        if (getInputsValue() < BlockChainBase.getMinimumTransaction()) {
+            log.error("#Transaction Inputs to small: " + getInputsValue());
             return false;
         }
 
@@ -75,13 +77,13 @@ public class Transaction {
 
         //add outputs to Unspent list
         for (TransactionOutput o : outputs) {
-            DumbChain.getUTXOs().put(o.getId(), o);
+            BlockChainBase.getUTXOs().put(o.getId(), o);
         }
 
         //remove transaction inputs from UTXO lists as spent:
         for (TransactionInput i : inputs) {
             if (i.getUTXO() == null) continue; //if Transaction can't be found skip it
-            DumbChain.getUTXOs().remove(i.getUTXO().getId());
+            BlockChainBase.getUTXOs().remove(i.getUTXO().getId());
         }
 
         return true;
@@ -136,5 +138,4 @@ public class Transaction {
     public ArrayList<TransactionOutput> getOutputs() {
         return outputs;
     }
-
 }
