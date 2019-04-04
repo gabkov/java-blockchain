@@ -26,7 +26,6 @@ public class Block {
 
         return calculatedhash;
     }
-
     public void mineBlock(int difficulty) {
         merkleRoot = StringUtil.getMerkleRoot(transactions); // calculating merkleRoot before mining
         String target = new String(new char[difficulty]).replace('\0', '0'); //Create a string with difficulty * "0"
@@ -37,8 +36,8 @@ public class Block {
         System.out.println("Block Mined!!! : " + hash);
     }
 
-    //Add transactions to this block
 
+    //Add transactions to this block
     public boolean addTransaction(Transaction transaction) {
         //process transaction and check if valid, unless block is genesis block then ignore.
         if (transaction == null) return false;
@@ -52,10 +51,10 @@ public class Block {
         System.out.println("Transaction Successfully added to Block");
         return true;
     }
+
     public String getHash() {
         return hash;
     }
-
     public String getPreviousHash() {
         return previousHash;
     }
@@ -68,4 +67,12 @@ public class Block {
         return merkleRoot;
     }
 
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public int getNonce() {
+        return nonce;
+    }
 }

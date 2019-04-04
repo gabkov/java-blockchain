@@ -61,13 +61,29 @@ public class BlockChainBase {
         return walletA;
     }
 
+    public static HashMap<String, HashMap<String, String>> getBlockchain() {
+        HashMap<String, HashMap<String, String>> formattedBlockchain = new HashMap<>();
+        for (int i = 0; i < blockchain.size(); i++) {
+            Block block = blockchain.get(i);
+            HashMap<String, String> blockData = new HashMap<>();
+            blockData.put("hash", block.getHash());
+            blockData.put("previous hash", block.getPreviousHash());
+            blockData.put("merkle root", block.getMerkleRoot());
+            blockData.put("timestamp", String.valueOf(block.getTimeStamp()));
+            blockData.put("nonce", String.valueOf(block.getNonce()));
+
+            formattedBlockchain.put("Block " + i, blockData);
+        }
+        return formattedBlockchain;
+    }
+
     public void genesis(){
         //Create the new wallets
         walletA = new Wallet();
         wallets.add(walletA);
         Wallet coinbase = new Wallet();
 
-        //create genesis transaction, which sends 100 NoobCoin to walletA:
+        //create genesis transaction, which sends 100 DumbCoin to walletA:
         genesisTransaction = new Transaction(coinbase.getPublicKey(), walletA.getPublicKey(), 100f, null);
         genesisTransaction.generateSignature(coinbase.getPrivateKey());     //manually sign the genesis transaction
         genesisTransaction.setTransactionId("0"); //manually set the transaction id
@@ -79,12 +95,10 @@ public class BlockChainBase {
         Block genesis = new Block("0");
         genesis.addTransaction(genesisTransaction);
         addBlock(genesis);
-        System.out.println("Genesis merkle root: " + genesis.getMerkleRoot());
+        log.info("Genesis merkle root: " + genesis.getMerkleRoot());
         currentBlock = new Block(genesis.getHash());
 
     }
-
-    // block1.addTransaction(walletA.sendFunds(walletB.getPublicKey(), 40f));
 
     public boolean newTransaction(Map<String, String> transactionData){
         // if the current block is already in the blockchain it means we need to start a new block to add the next transactions

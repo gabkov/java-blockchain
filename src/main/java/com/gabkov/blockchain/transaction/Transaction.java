@@ -135,5 +135,4 @@ public class Transaction {
     public ArrayList<TransactionOutput> getOutputs() {
         return outputs;
     }
-
 }

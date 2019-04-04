@@ -1,6 +1,7 @@
 package com.gabkov.blockchain.controller;
 
 
+import com.gabkov.blockchain.Block;
 import com.gabkov.blockchain.services.BlockChainBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -49,6 +52,12 @@ public class ApiController {
     public ResponseEntity<?> mineNextBlock(){
         blockChainBase.mineNextBlock();
         return new ResponseEntity<>("Next block mined successfully", HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/api/get-blockchain")
+    public HashMap<String, HashMap<String, String>> getCurrentBlockChain(){
+        return BlockChainBase.getBlockchain();
     }
 
 }
