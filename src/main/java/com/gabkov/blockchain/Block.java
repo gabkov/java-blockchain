@@ -51,6 +51,7 @@ public class Block {
         }
         transactions.add(transaction);
         log.info("Transaction Successfully added to Block");
+        log.info("Transaction hash: " + transaction.getTransactionId());
         return true;
     }
 
