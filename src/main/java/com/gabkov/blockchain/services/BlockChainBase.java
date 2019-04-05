@@ -158,6 +158,9 @@ public class BlockChainBase {
     }
 
     public void mineNextBlock() {
+        if (blockchain.contains(currentBlock)) {
+            currentBlock = new Block(blockchain.get(blockchain.size() - 1).getHash());
+        }
         addBlock(currentBlock);
         isChainValid();
     }
