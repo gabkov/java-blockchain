@@ -130,6 +130,11 @@ public class BlockChainBase {
         return null;
     }
 
+    public Wallet getWalletAndBalance(String address){
+        Wallet wallet = getWalletByStringPK(address);
+        return wallet;
+    }
+
     public void mineNextBlock(){
         addBlock(currentBlock);
         isChainValid();

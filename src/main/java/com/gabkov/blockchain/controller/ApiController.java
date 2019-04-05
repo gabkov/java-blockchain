@@ -1,7 +1,7 @@
 package com.gabkov.blockchain.controller;
 
 
-import com.gabkov.blockchain.Block;
+import com.gabkov.blockchain.Wallet;
 import com.gabkov.blockchain.services.BlockChainBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -58,6 +58,16 @@ public class ApiController {
     @RequestMapping(value = "/api/get-blockchain")
     public List<HashMap<String, HashMap<String, String>>> getCurrentBlockChain(){
         return BlockChainBase.getBlockchain();
+    }
+
+
+    @RequestMapping(value = "/api/get-balance")
+    public ResponseEntity<?> getWalletAndBalance(@RequestBody Map<String, String> address){
+        Wallet wallet = blockChainBase.getWalletAndBalance(address.get("address"));
+        if(wallet != null) {
+            return new ResponseEntity<>(wallet.toString(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Invalid Address", HttpStatus.NOT_FOUND);
     }
 
 }
