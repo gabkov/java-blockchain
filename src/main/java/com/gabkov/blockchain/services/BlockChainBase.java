@@ -20,6 +20,8 @@ public class BlockChainBase {
 
     // Initial wallet for starting transactions
     private Wallet walletA;
+    // Coinbase wallet for new coin generation after every successfully mined block
+    private Wallet coinbase;
 
     private static ArrayList<Block> blockchain = new ArrayList<Block>();
     private static HashMap<String, TransactionOutput> UTXOs = new HashMap<>(); //list of all unspent transactions.
@@ -106,7 +108,7 @@ public class BlockChainBase {
         //Create the new wallets
         walletA = new Wallet();
         wallets.add(walletA);
-        Wallet coinbase = new Wallet();
+        coinbase = new Wallet();
 
         //create genesis transaction, which sends 100 DumbCoin to walletA:
         genesisTransaction = new Transaction(coinbase.getPublicKey(), walletA.getPublicKey(), 100f, null);
@@ -162,6 +164,15 @@ public class BlockChainBase {
         if (blockchain.contains(currentBlock)) {
             currentBlock = new Block(blockchain.get(blockchain.size() - 1).getHash());
         }
+        Transaction coinbaseTransaction = new Transaction(coinbase.getPublicKey(), walletA.getPublicKey(), 50f, null);
+        coinbaseTransaction.generateSignature(coinbase.getPrivateKey()); // manually signing the transaction
+
+        coinbaseTransaction.setTransactionId("coinbase transaction " + blockchain.size()); //manually set the transaction id to "0"
+        coinbaseTransaction.getOutputs().add(new TransactionOutput(coinbaseTransaction.getReciepient(), coinbaseTransaction.getValue(), coinbaseTransaction.getTransactionId())); //manually add the Transactions Output
+        UTXOs.put(coinbaseTransaction.getOutputs().get(0).getId(), coinbaseTransaction.getOutputs().get(0)); // store our transaction in the UTXOs list.
+
+        currentBlock.addTransaction(coinbaseTransaction);
+
         addBlock(currentBlock);
         isChainValid();
     }
@@ -203,25 +214,27 @@ public class BlockChainBase {
                     log.error("#Signature on Transaction(" + t + ") is Invalid");
                     return false;
                 }
-                if (currentTransaction.getInputsValue() != currentTransaction.getOutputsValue()) {
-                    log.error("#Inputs are note equal to outputs on Transaction(" + t + ")");
-                    return false;
-                }
 
-                for (TransactionInput input : currentTransaction.getInputs()) {
-                    tempOutput = tempUTXOs.get(input.getTransactionOutputId());
-
-                    if (tempOutput == null) {
-                        log.error("#Referenced input on Transaction(" + t + ") is Missing");
+                // check if inputs are null, if yes it is a coinbase transaction so ignore it
+                if (currentTransaction.getInputs() != null) {
+                    if (currentTransaction.getInputsValue() != currentTransaction.getOutputsValue()) {
+                        log.error("#Inputs are note equal to outputs on Transaction(" + t + ")");
                         return false;
                     }
+                    for (TransactionInput input : currentTransaction.getInputs()) {
+                        tempOutput = tempUTXOs.get(input.getTransactionOutputId());
 
-                    if (input.getUTXO().getValue() != tempOutput.getValue()) {
-                        log.error("#Referenced input Transaction(" + t + ") value is Invalid");
-                        return false;
+                        if (tempOutput == null) {
+                            log.error("#Referenced input on Transaction(" + t + ") is Missing");
+                            return false;
+                        }
+
+                        if (input.getUTXO().getValue() != tempOutput.getValue()) {
+                            log.error("#Referenced input Transaction(" + t + ") value is Invalid");
+                            return false;
+                        }
+                        tempUTXOs.remove(input.getTransactionOutputId());
                     }
-
-                    tempUTXOs.remove(input.getTransactionOutputId());
                 }
 
                 for (TransactionOutput output : currentTransaction.getOutputs()) {
@@ -232,9 +245,12 @@ public class BlockChainBase {
                     log.error("#Transaction(" + t + ") output reciepient is not who it should be");
                     return false;
                 }
-                if (currentTransaction.getOutputs().get(1).getReciepient() != currentTransaction.getSender()) {
-                    log.error("#Transaction(" + t + ") output 'change' is not sender.");
-                    return false;
+                // if a block only contains coinbase transaction ignore this validation
+                if (currentTransaction.getOutputs().size() > 1) {
+                    if (currentTransaction.getOutputs().get(1).getReciepient() != currentTransaction.getSender()) {
+                        log.error("#Transaction(" + t + ") output 'change' is not sender.");
+                        return false;
+                    }
                 }
 
             }

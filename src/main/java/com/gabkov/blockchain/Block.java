@@ -43,13 +43,19 @@ public class Block {
     public boolean addTransaction(Transaction transaction) {
         //process transaction and check if valid, unless block is genesis block then ignore.
         if (transaction == null) return false;
-        if ((!previousHash.equals("0"))) {
+        // since coinbase transaction don't have inputs it is set to null so ignore it
+        if ((!previousHash.equals("0")) && transaction.getInputs() != null) {
             if ((transaction.processTransaction() != true)) {
                 log.error("Transaction failed to process. Discarded.");
                 return false;
             }
         }
-        transactions.add(transaction);
+        // if it is a coinbase transaction put to the beginning of transactions since that is the first transaction at a block
+        if(transaction.getInputs() == null){
+            transactions.add(0, transaction);
+        } else {
+            transactions.add(transaction);
+        }
         log.info("Transaction Successfully added to Block");
         log.info("Transaction hash: " + transaction.getTransactionId());
         return true;
