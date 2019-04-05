@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ public class ApiController {
 
 
     @RequestMapping(value = "/api/get-blockchain")
-    public List<HashMap<String, HashMap<String, String>>> getCurrentBlockChain(){
+    public List<LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, String>>>> getCurrentBlockChain(){
         return BlockChainBase.getBlockchain();
     }
 

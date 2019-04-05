@@ -39,7 +39,7 @@ public class BlockChainBase {
         return minimumTransaction;
     }
 
-    public BlockChainBase(WalletCreator walletCreator){
+    public BlockChainBase(WalletCreator walletCreator) {
         this.walletCreator = walletCreator;
     }
 
@@ -48,7 +48,7 @@ public class BlockChainBase {
         blockchain.add(newBlock);
     }
 
-    public Wallet getNewWallet(){
+    public Wallet getNewWallet() {
         Wallet newWallet = walletCreator.createNewWallet();
         wallets.add(newWallet);
         return newWallet;
@@ -58,29 +58,41 @@ public class BlockChainBase {
         return walletA;
     }
 
-    public static List<HashMap<String, HashMap<String, String>>> getBlockchain() {
-        List<HashMap<String, HashMap<String, String>>> formattedBlockChain = new ArrayList<>();
-        for (int i = 0; i < blockchain.size(); i++) {
-            HashMap<String, HashMap<String, String>> formattedBlock = new HashMap<>();
-            Block block = blockchain.get(i);
-            HashMap<String, String> blockData = new HashMap<>();
-            blockData.put("hash", block.getHash());
-            blockData.put("previous hash", block.getPreviousHash());
-            blockData.put("merkle root", block.getMerkleRoot());
-            blockData.put("timestamp", String.valueOf(block.getTimeStamp()));
-            blockData.put("nonce", String.valueOf(block.getNonce()));
-            blockData.put("number of transactions", String.valueOf(block.getTransactions().size()));
+    public static List<LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, String>>>> getBlockchain() {
 
-            formattedBlock.put("Block " + i, blockData);
+        List<LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, String>>>> formattedBlockChain = new ArrayList<>();
+
+        for (int i = 0; i < blockchain.size(); i++) {
+            LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, String>>> formattedBlock = new LinkedHashMap<>();
+            LinkedHashMap<String, LinkedHashMap<String, String>> formattedBlockData = new LinkedHashMap<>();
+
+            Block block = blockchain.get(i);
+
+            LinkedHashMap<String, String> blockHeader = new LinkedHashMap<>();
+            blockHeader.put("hash", block.getHash());
+            blockHeader.put("previous hash", block.getPreviousHash());
+            blockHeader.put("merkle root", block.getMerkleRoot());
+            blockHeader.put("timestamp", String.valueOf(block.getTimeStamp()));
+            blockHeader.put("nonce", String.valueOf(block.getNonce()));
+            blockHeader.put("number of transactions", String.valueOf(block.getTransactions().size()));
+
+            formattedBlockData.put("block header", blockHeader);
+
+            for (int j = 0; j < block.getTransactions().size(); j++) {
+                LinkedHashMap<String, String> transaction = block.getTransactions().get(j).getTransactionInfo();
+                formattedBlockData.put("transaction " + j, transaction);
+            }
+
+            formattedBlock.put("Block " + i, formattedBlockData);
             formattedBlockChain.add(formattedBlock);
         }
         return formattedBlockChain;
     }
 
-    public static LinkedHashMap<String, String> getTransactionInfo(String transactionId){
+    public static LinkedHashMap<String, String> getTransactionInfo(String transactionId) {
         for (Block block : blockchain) {
-            for(Transaction transaction : block.getTransactions()){
-                if(transaction.getTransactionId().equals(transactionId)){
+            for (Transaction transaction : block.getTransactions()) {
+                if (transaction.getTransactionId().equals(transactionId)) {
                     LinkedHashMap<String, String> requiredTransaction = transaction.getTransactionInfo();
                     requiredTransaction.put("included in block", block.getHash());
                     return requiredTransaction;
@@ -90,7 +102,7 @@ public class BlockChainBase {
         return null;
     }
 
-    public void genesis(){
+    public void genesis() {
         //Create the new wallets
         walletA = new Wallet();
         wallets.add(walletA);
@@ -113,15 +125,15 @@ public class BlockChainBase {
 
     }
 
-    public boolean newTransaction(Map<String, String> transactionData){
+    public boolean newTransaction(Map<String, String> transactionData) {
         // if the current block is already in the blockchain it means we need to start a new block to add the next transactions
-        if(blockchain.contains(currentBlock)){
-            currentBlock = new Block(blockchain.get(blockchain.size()-1).getHash());
+        if (blockchain.contains(currentBlock)) {
+            currentBlock = new Block(blockchain.get(blockchain.size() - 1).getHash());
         }
         Wallet from = getWalletByStringPK(transactionData.get("sender"));
         Wallet to = getWalletByStringPK(transactionData.get("recipient"));
         float value = Float.parseFloat(transactionData.get("value"));
-        if (from == null || to == null){
+        if (from == null || to == null) {
             log.error("Invalid addresses");
             return false;
         }
@@ -131,21 +143,21 @@ public class BlockChainBase {
         return currentBlock.addTransaction(newTransaction);
     }
 
-    private Wallet getWalletByStringPK(String publicKey){
-        for(Wallet wallet : wallets){
-            if(StringUtil.getStringFromKey(wallet.getPublicKey()).equals(publicKey)){
+    private Wallet getWalletByStringPK(String publicKey) {
+        for (Wallet wallet : wallets) {
+            if (StringUtil.getStringFromKey(wallet.getPublicKey()).equals(publicKey)) {
                 return wallet;
             }
         }
         return null;
     }
 
-    public Wallet getWalletAndBalance(String address){
+    public Wallet getWalletAndBalance(String address) {
         Wallet wallet = getWalletByStringPK(address);
         return wallet;
     }
 
-    public void mineNextBlock(){
+    public void mineNextBlock() {
         addBlock(currentBlock);
         isChainValid();
     }
