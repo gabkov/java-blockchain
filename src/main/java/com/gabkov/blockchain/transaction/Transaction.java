@@ -63,9 +63,8 @@ public class Transaction {
         }
 
         //check if transaction is valid:
-        // Todo check back here why is this not working properly
-        if (getInputsValue() < BlockChainBase.getMinimumTransaction()) {
-            log.error("#Transaction Inputs to small: " + getInputsValue());
+        if (value < BlockChainBase.getMinimumTransaction()) {
+            log.error("#Transaction Inputs to small: " + value);
             return false;
         }
 

@@ -115,9 +115,9 @@ public class BlockChainBase {
             log.error("Invalid addresses");
             return false;
         }
+        // If sendFunds return null it means that there was not enough funds in the sender wallet for the transaction
         Transaction newTransaction = from.sendFunds(to.getPublicKey(), value);
-        if(newTransaction == null) return false;
-        // adding the new transaction to the currentBlock, more validation inside addTransaction <-- returns a boolean
+        // Adding the new transaction to the currentBlock, more validation inside addTransaction <-- returns a boolean
         return currentBlock.addTransaction(newTransaction);
     }
 

@@ -66,6 +66,7 @@ public class Wallet {
         //create array list of inputs
         ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
 
+        // Creating the inputs from the outputs "owned" by this wallet
         float total = 0;
         for (Map.Entry<String, TransactionOutput> item : UTXOs.entrySet()) {
             TransactionOutput UTXO = item.getValue();
@@ -77,6 +78,7 @@ public class Wallet {
         Transaction newTransaction = new Transaction(publicKey, _recipient, value, inputs);
         newTransaction.generateSignature(privateKey);
 
+        // The used outputs gets removed from the Wallet UTXOs by referencing the inputs list what we just created
         for (TransactionInput input : inputs) {
             UTXOs.remove(input.getTransactionOutputId());
         }
