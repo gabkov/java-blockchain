@@ -6,11 +6,13 @@ import com.gabkov.blockchain.services.BlockChainBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +46,7 @@ public class ApiController {
         if(blockChainBase.newTransaction(transactionData)){
             return new ResponseEntity<>("Transaction done, waiting for confirmation", HttpStatus.OK);
         }else {
-            return new ResponseEntity<>("Invalid transaction", HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>("Invalid transaction", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -67,7 +69,17 @@ public class ApiController {
         if(wallet != null) {
             return new ResponseEntity<>(wallet.toString(), HttpStatus.OK);
         }
-        return new ResponseEntity<>("Invalid Address", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Invalid address", HttpStatus.BAD_REQUEST);
+    }
+
+
+    @RequestMapping(value = "/api/get-transaction-info/{id}")
+    public ResponseEntity<?> getTransactionInfoByHash(@PathVariable (value = "id") String id){
+        LinkedHashMap<String, String> transaction = BlockChainBase.getTransactionInfo(id);
+        if(transaction != null){
+            return new ResponseEntity<>(transaction, HttpStatus.OK);
+        }
+        return new ResponseEntity<>("There is no transaction with the provided id", HttpStatus.BAD_REQUEST);
     }
 
 }

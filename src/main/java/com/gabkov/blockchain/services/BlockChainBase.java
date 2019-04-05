@@ -9,10 +9,7 @@ import com.gabkov.blockchain.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -78,6 +75,19 @@ public class BlockChainBase {
             formattedBlockChain.add(formattedBlock);
         }
         return formattedBlockChain;
+    }
+
+    public static LinkedHashMap<String, String> getTransactionInfo(String transactionId){
+        for (Block block : blockchain) {
+            for(Transaction transaction : block.getTransactions()){
+                if(transaction.getTransactionId().equals(transactionId)){
+                    LinkedHashMap<String, String> requiredTransaction = transaction.getTransactionInfo();
+                    requiredTransaction.put("included in block", block.getHash());
+                    return requiredTransaction;
+                }
+            }
+        }
+        return null;
     }
 
     public void genesis(){

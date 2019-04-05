@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.security.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 
 @Slf4j
@@ -86,6 +87,15 @@ public class Transaction {
         }
 
         return true;
+    }
+
+    public LinkedHashMap<String, String> getTransactionInfo(){
+        LinkedHashMap<String, String> transaction = new LinkedHashMap<>();
+        transaction.put("transaction id", transactionId);
+        transaction.put("sender", StringUtil.getStringFromKey(sender));
+        transaction.put("recipient", StringUtil.getStringFromKey(reciepient));
+        transaction.put("amount", String.valueOf(value));
+        return transaction;
     }
 
     //returns sum of inputs(UTXOs) values
