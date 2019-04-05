@@ -158,6 +158,7 @@ public class BlockChainBase {
     }
 
     public void mineNextBlock() {
+        // if the current block is already in the blockchain it means we need to start a new block, this is only used when there are no transactions and just mine a new "empty" block
         if (blockchain.contains(currentBlock)) {
             currentBlock = new Block(blockchain.get(blockchain.size() - 1).getHash());
         }
