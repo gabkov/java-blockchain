@@ -9,10 +9,7 @@ import com.gabkov.blockchain.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -23,6 +20,8 @@ public class BlockChainBase {
 
     // Initial wallet for starting transactions
     private Wallet walletA;
+    // Coinbase wallet for new coin generation after every successfully mined block
+    private Wallet coinbase;
 
     private static ArrayList<Block> blockchain = new ArrayList<Block>();
     private static HashMap<String, TransactionOutput> UTXOs = new HashMap<>(); //list of all unspent transactions.
@@ -42,7 +41,7 @@ public class BlockChainBase {
         return minimumTransaction;
     }
 
-    public BlockChainBase(WalletCreator walletCreator){
+    public BlockChainBase(WalletCreator walletCreator) {
         this.walletCreator = walletCreator;
     }
 
@@ -51,7 +50,7 @@ public class BlockChainBase {
         blockchain.add(newBlock);
     }
 
-    public Wallet getNewWallet(){
+    public Wallet getNewWallet() {
         Wallet newWallet = walletCreator.createNewWallet();
         wallets.add(newWallet);
         return newWallet;
@@ -61,30 +60,55 @@ public class BlockChainBase {
         return walletA;
     }
 
-    public static List<HashMap<String, HashMap<String, String>>> getBlockchain() {
-        List<HashMap<String, HashMap<String, String>>> formattedBlockChain = new ArrayList<>();
-        for (int i = 0; i < blockchain.size(); i++) {
-            HashMap<String, HashMap<String, String>> formattedBlock = new HashMap<>();
-            Block block = blockchain.get(i);
-            HashMap<String, String> blockData = new HashMap<>();
-            blockData.put("hash", block.getHash());
-            blockData.put("previous hash", block.getPreviousHash());
-            blockData.put("merkle root", block.getMerkleRoot());
-            blockData.put("timestamp", String.valueOf(block.getTimeStamp()));
-            blockData.put("nonce", String.valueOf(block.getNonce()));
-            blockData.put("number of transactions", String.valueOf(block.getTransactions().size()));
+    public static List<LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, String>>>> getBlockchain() {
 
-            formattedBlock.put("Block " + i, blockData);
+        List<LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, String>>>> formattedBlockChain = new ArrayList<>();
+
+        for (int i = 0; i < blockchain.size(); i++) {
+            LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, String>>> formattedBlock = new LinkedHashMap<>();
+            LinkedHashMap<String, LinkedHashMap<String, String>> formattedBlockData = new LinkedHashMap<>();
+
+            Block block = blockchain.get(i);
+
+            LinkedHashMap<String, String> blockHeader = new LinkedHashMap<>();
+            blockHeader.put("hash", block.getHash());
+            blockHeader.put("previous hash", block.getPreviousHash());
+            blockHeader.put("merkle root", block.getMerkleRoot());
+            blockHeader.put("timestamp", String.valueOf(block.getTimeStamp()));
+            blockHeader.put("nonce", String.valueOf(block.getNonce()));
+            blockHeader.put("number of transactions", String.valueOf(block.getTransactions().size()));
+
+            formattedBlockData.put("block header", blockHeader);
+
+            for (int j = 0; j < block.getTransactions().size(); j++) {
+                LinkedHashMap<String, String> transaction = block.getTransactions().get(j).getTransactionInfo();
+                formattedBlockData.put("transaction " + j, transaction);
+            }
+
+            formattedBlock.put("Block " + i, formattedBlockData);
             formattedBlockChain.add(formattedBlock);
         }
         return formattedBlockChain;
     }
 
-    public void genesis(){
+    public static LinkedHashMap<String, String> getTransactionInfo(String transactionId) {
+        for (Block block : blockchain) {
+            for (Transaction transaction : block.getTransactions()) {
+                if (transaction.getTransactionId().equals(transactionId)) {
+                    LinkedHashMap<String, String> requiredTransaction = transaction.getTransactionInfo();
+                    requiredTransaction.put("included in block", block.getHash());
+                    return requiredTransaction;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void genesis() {
         //Create the new wallets
         walletA = new Wallet();
         wallets.add(walletA);
-        Wallet coinbase = new Wallet();
+        coinbase = new Wallet();
 
         //create genesis transaction, which sends 100 DumbCoin to walletA:
         genesisTransaction = new Transaction(coinbase.getPublicKey(), walletA.getPublicKey(), 100f, null);
@@ -103,34 +127,52 @@ public class BlockChainBase {
 
     }
 
-    public boolean newTransaction(Map<String, String> transactionData){
+    public boolean newTransaction(Map<String, String> transactionData) {
         // if the current block is already in the blockchain it means we need to start a new block to add the next transactions
-        if(blockchain.contains(currentBlock)){
-            currentBlock = new Block(blockchain.get(blockchain.size()-1).getHash());
+        if (blockchain.contains(currentBlock)) {
+            currentBlock = new Block(blockchain.get(blockchain.size() - 1).getHash());
         }
         Wallet from = getWalletByStringPK(transactionData.get("sender"));
         Wallet to = getWalletByStringPK(transactionData.get("recipient"));
         float value = Float.parseFloat(transactionData.get("value"));
-        if (from == null || to == null){
+        if (from == null || to == null) {
             log.error("Invalid addresses");
             return false;
         }
+        // If sendFunds return null it means that there was not enough funds in the sender wallet for the transaction
         Transaction newTransaction = from.sendFunds(to.getPublicKey(), value);
-        if(newTransaction == null) return false;
-        // adding the new transaction to the currentBlock, more validation inside addTransaction <-- returns a boolean
+        // Adding the new transaction to the currentBlock, more validation inside addTransaction <-- returns a boolean
         return currentBlock.addTransaction(newTransaction);
     }
 
-    private Wallet getWalletByStringPK(String publicKey){
-        for(Wallet wallet : wallets){
-            if(StringUtil.getStringFromKey(wallet.getPublicKey()).equals(publicKey)){
+    private Wallet getWalletByStringPK(String publicKey) {
+        for (Wallet wallet : wallets) {
+            if (StringUtil.getStringFromKey(wallet.getPublicKey()).equals(publicKey)) {
                 return wallet;
             }
         }
         return null;
     }
 
-    public void mineNextBlock(){
+    public Wallet getWalletAndBalance(String address) {
+        Wallet wallet = getWalletByStringPK(address);
+        return wallet;
+    }
+
+    public void mineNextBlock() {
+        // if the current block is already in the blockchain it means we need to start a new block, this is only used when there are no transactions and just mine a new "empty" block
+        if (blockchain.contains(currentBlock)) {
+            currentBlock = new Block(blockchain.get(blockchain.size() - 1).getHash());
+        }
+        Transaction coinbaseTransaction = new Transaction(coinbase.getPublicKey(), walletA.getPublicKey(), 50f, null);
+        coinbaseTransaction.generateSignature(coinbase.getPrivateKey()); // manually signing the transaction
+
+        coinbaseTransaction.setTransactionId("coinbase transaction " + blockchain.size()); //manually set the transaction id to "0"
+        coinbaseTransaction.getOutputs().add(new TransactionOutput(coinbaseTransaction.getReciepient(), coinbaseTransaction.getValue(), coinbaseTransaction.getTransactionId())); //manually add the Transactions Output
+        UTXOs.put(coinbaseTransaction.getOutputs().get(0).getId(), coinbaseTransaction.getOutputs().get(0)); // store our transaction in the UTXOs list.
+
+        currentBlock.addTransaction(coinbaseTransaction);
+
         addBlock(currentBlock);
         isChainValid();
     }
@@ -172,25 +214,27 @@ public class BlockChainBase {
                     log.error("#Signature on Transaction(" + t + ") is Invalid");
                     return false;
                 }
-                if (currentTransaction.getInputsValue() != currentTransaction.getOutputsValue()) {
-                    log.error("#Inputs are note equal to outputs on Transaction(" + t + ")");
-                    return false;
-                }
 
-                for (TransactionInput input : currentTransaction.getInputs()) {
-                    tempOutput = tempUTXOs.get(input.getTransactionOutputId());
-
-                    if (tempOutput == null) {
-                        log.error("#Referenced input on Transaction(" + t + ") is Missing");
+                // check if inputs are null, if yes it is a coinbase transaction so ignore it
+                if (currentTransaction.getInputs() != null) {
+                    if (currentTransaction.getInputsValue() != currentTransaction.getOutputsValue()) {
+                        log.error("#Inputs are note equal to outputs on Transaction(" + t + ")");
                         return false;
                     }
+                    for (TransactionInput input : currentTransaction.getInputs()) {
+                        tempOutput = tempUTXOs.get(input.getTransactionOutputId());
 
-                    if (input.getUTXO().getValue() != tempOutput.getValue()) {
-                        log.error("#Referenced input Transaction(" + t + ") value is Invalid");
-                        return false;
+                        if (tempOutput == null) {
+                            log.error("#Referenced input on Transaction(" + t + ") is Missing");
+                            return false;
+                        }
+
+                        if (input.getUTXO().getValue() != tempOutput.getValue()) {
+                            log.error("#Referenced input Transaction(" + t + ") value is Invalid");
+                            return false;
+                        }
+                        tempUTXOs.remove(input.getTransactionOutputId());
                     }
-
-                    tempUTXOs.remove(input.getTransactionOutputId());
                 }
 
                 for (TransactionOutput output : currentTransaction.getOutputs()) {
@@ -201,9 +245,12 @@ public class BlockChainBase {
                     log.error("#Transaction(" + t + ") output reciepient is not who it should be");
                     return false;
                 }
-                if (currentTransaction.getOutputs().get(1).getReciepient() != currentTransaction.getSender()) {
-                    log.error("#Transaction(" + t + ") output 'change' is not sender.");
-                    return false;
+                // if a block only contains coinbase transaction ignore this validation
+                if (currentTransaction.getOutputs().size() > 1) {
+                    if (currentTransaction.getOutputs().get(1).getReciepient() != currentTransaction.getSender()) {
+                        log.error("#Transaction(" + t + ") output 'change' is not sender.");
+                        return false;
+                    }
                 }
 
             }
