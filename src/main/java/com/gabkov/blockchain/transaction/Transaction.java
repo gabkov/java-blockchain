@@ -96,6 +96,7 @@ public class Transaction {
             if (i.getUTXO() == null) continue; //if Transaction can't be found skip it
             total += i.getUTXO().getValue();
         }
+        log.info("TOTAL: " + total);
         return total;
     }
 
