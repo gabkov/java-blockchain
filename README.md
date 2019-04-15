@@ -1,6 +1,7 @@
 # Java blockchain with Spring
 
-This project is an UTXO blockchain just like the king of all cryptocurrencies: Bitcoin. Currently it is just a simple **Spring** back-end api, with enpoints like:
+I made this project to learn about blockchain and Bitcoin in general, because my further goal is to develop a bitcoin wallet.
+This is an UTXO blockchain just like the king of all cryptocurrencies: Bitcoin. Currently it is just a simple **Spring** back-end api, with enpoints like:
   - /api/genesis
   - /api/new-wallet
   - /api/new-transaction
